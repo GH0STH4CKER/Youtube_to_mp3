@@ -13,3 +13,4 @@ Commands :
 <br>
   
 [![Github All Releases](https://img.shields.io/github/downloads/GH0STH4CKER/Youtube_to_mp3/total.svg)]()
+[![HitCount](http://hits.dwyl.com/GH0STH4CKER/Youtube_to_mp3.svg)](http://hits.dwyl.com/GH0STH4CKER/Youtube_to_mp3)
