@@ -1,9 +1,9 @@
+import requests , json
+from tqdm import tqdm
 import requests, bs4, socket, os, time
 from bs4 import BeautifulSoup as bSoup
 from colorama import Fore, init
 from tqdm import tqdm
-
-
 init()
 lg = Fore.LIGHTGREEN_EX
 ly = Fore.LIGHTYELLOW_EX
@@ -14,11 +14,12 @@ banner = """
  █▄▄▄█   █   　   █   █  █ 　 █ ▀ █ █  █   ▀▄ 
    █     █   　   ▀   ▀▀▀▀ 　 ▀   ▀ █▀▀▀ █▄▄█  
 ------------------------------------------------"""
-tag = """   [+] Made By GH0STH4CK3R     [+] Version 1.2
+tag = """   [+] Made By GH0STH4CK3R     [+] Version 2.0
 ------------------------------------------------"""
 
 print(lg + banner)
 print(ly + tag)
+ytlink = input("Enter YT link : ")
 
 try:
     ip = socket.gethostbyname("www.google.com")
@@ -26,98 +27,103 @@ except Exception as e:
     print(lr + "\nNo Internet !")
     time.sleep(5)
     exit()
-print(lg + "")
-ytlink = input("Enter YT Link : ")
 
-if "youtu.be" in ytlink:
-    ysplit = ytlink.split("youtu.be/")
-    yc = ysplit[1]
-    ytlink = "https://www.youtube.com/watch?v=" + yc
-# print(ytlink)
+# ---------------------------------------------------------------------------- HTTP REQUEST NO 1
 
-# ytlink = "https://www."+ytlink
-try:
-    ytcode = ytlink.split("=")[1]
-except Exception as ee:
-    print("Invlid Url Type !")
-    time.sleep(5)
-    exit()
+url1 = "https://yt1s.com/api/ajaxSearch/index"
 
-url = "https://www.320youtube.com/v25/convert"
-params = {"v": ytlink}
-# Sample https://www.youtube.com/watch?v=A57B7B6w3kw
+data = {"q": ytlink,"vt": "mp3"}
 
-res = requests.get(url, params=params)
+r = requests.post(url1,data=data)
 
-url1 = "https://www.320youtube.com/v25/watch"
-params1 = {"v": ytcode}
+response =  json.loads(r.text)
 
-res1 = requests.get(url1, params=params1)
+vid = response['vid']                # Get video id
+k = response['kc']
+title = response['title']            # Get title
+a_rtist = response['a']
+print(lg+"\nTitle    : ",title)
+print("Uploader : ",a_rtist)
 
-# print(res1.status_code)
-data = res1.text
+# ---------------------------------------------------------------------------- HTTP REQUEST NO 2
 
-if "<form action" in data:
+url2 = "https://yt1s.com/api/ajaxConvert/convert"
 
-    page_soup = bSoup(data, "html.parser")
+data = {"vid": vid,"k": k}
 
-    html = page_soup.find_all("form")
+r2= requests.post(url2,data=data)
+# ------------------------------------------------ Spinner
+import sys
+import time
 
-    titles = page_soup.find_all("h4")
-    details = page_soup.find_all("small")
+print(ly+"")
+def spinning_cursor():
 
-    title = str(titles[0]).replace("<h4>", "")
-    title = title.replace("</h4>", "")
+    cs = ['Converting /','Converting -','Converting \\','Converting |']
 
-    detail = str(details[0]).replace("<small>", "")
-    detail = detail.replace("</small>", "")
+    while True:
+        for cursor in cs :
+            yield cursor
 
-    d_link = html[0]["action"]
+spinner = spinning_cursor()
+for _ in range(20):
+    sys.stdout.write(next(spinner))
+    sys.stdout.flush()
+    time.sleep(0.1)
+    sys.stdout.write('\b\b\b\b\b\b\b\b\b\b\b\b')    
+#sys.stdout.write('\b\b\b\b\b\b\b\b\b\b\b\b') 
 
-    print("\nTitle: ", title)
-    print("")
-    print(detail)
+res = json.loads(r2.text)
 
-    print("\nDownload link : ", d_link)
+dlink = res['dlink']              # Get download url
+#print(res)
 
-    ### file size
-    content_size = detail[(detail.find('Size:')+5):(detail.find('Size:')+20)]
-    #print(content_size)
-    if "GB" in content_size :
-        content_size = content_size.replace('GB','')
-        content_length = float(content_size) * 1000000000
-    if "MB" in content_size :
-        content_size = content_size.replace('MB','')
-        content_length = float(content_size) * 1000000
-    if "KB" in content_size :
-        content_size = content_size.replace('KB','')
-        content_length = float(content_size) * 1000
+
+# ---------------------------------------------------------------------------- HTTP REQUEST NO 3
+
+url3 = dlink
+
+headers = {
+    "authority": "dl228.iijjvii.biz",
+    "method": "GET",
+    "path": "/?file=M3R4SUNiN3JsOHJ6WWQ3aTdPRFA4NW1rRVJIOG10b0F0dndkN3lSb0lwMWdrc1prKytIckI5eEVLK3hFK1lPdkZKVmc1ei9PZE56QUhpeTYvYW9qVG5hQTVOTnp0QytjdFlncFZjeE9SaGZzazd2bXhCZHZoaExoYTlySVVPcHdZR2NvNWhKRmhXUEI2dWlHdEJUc3RqT3VxRURJSVc4SHV6OEZOUExZNWFCTHcyWGZVUHZoN0pRUXBpT2c5cE5FMzgrSnBnRGd4cjRCdHQ5bVlWWnhmNVZjeXAvSzg4YnByRlFidUw4KzIyenFwUEwxUUprd0UvaS9USEYxSmpJQSsrcjdWUllia25SSXFqenNyL2gzdnpKUFlyWW8rM1RsckE9PQ%3D%3D",
+    "scheme": "https",
+    "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+    "accept-encoding": "gzip, deflate, br",
+    "accept-language": "en-US,en;q=0.9",
+    "referer": "https://yt1s.com/",
+    "sec-ch-ua": "\"Chromium\";v=\"90\", \"Opera\";v=\"76\", \";Not A Brand\";v=\"99\"",
+    "sec-ch-ua-mobile": "?0",
+    "sec-fetch-dest": "document",
+    "sec-fetch-mode": "navigate",
+    "sec-fetch-site": "cross-site",
+    "upgrade-insecure-requests": "1",
+    "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.85 Safari/537.36 OPR/76.0.4017.94"
+}
+
+params = {"file": dlink}
+
+r3 = requests.get(url3,stream=True)
+
+tnm = str(title)
+songname = tnm+".mp3"
+
+rcode = r3.status_code              
+print(lg+"")
+if rcode == 200 :
     
-    #content_length = int(content_size) * 
-    #print(content_length)    
-
-    res2 = requests.get(d_link)
-    songname = title + ".mp3"
-
-    def download(url, fname):
-        resp = requests.get(url, stream=True)
-        total = float(content_length)
-        with open(fname, 'wb') as file, tqdm(
-                desc=fname,
-                total=total,
-                unit='iB',
-                unit_scale=True,
-                unit_divisor=1024,
-        ) as bar:
-            for data in resp.iter_content(chunk_size=1024):
-                size = file.write(data)
-                bar.update(size)
-
-    download(d_link,songname)            
-    
-    print("\nFile Download Success !")
-
-else:
-    print(lr + "SOmething went wrong !")
-
-input("\n[ Thank you for using my program ~ GH0STH4CK3R ]")
+    total = int(r3.headers.get('content-length', 0))   # Progressbar
+    with open(songname, 'wb') as file, tqdm(
+            desc=songname,
+            total=total,
+            unit='iB',
+            unit_scale=True,
+            unit_divisor=1024,
+    ) as bar:
+        for data in r3.iter_content(chunk_size=1024):
+            size = file.write(data)                     # Downloading
+            bar.update(size)
+    print("\nDownloaded > ",songname)        
+    input("")
+else :
+    print("Download failed ! ",rcode)    
