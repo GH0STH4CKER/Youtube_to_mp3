@@ -39,7 +39,7 @@ r = requests.post(url1,data=data)
 response =  json.loads(r.text)
 
 vid = response['vid']                # Get video id
-k = response['kc']
+k = response['links']['mp3']['mp3128']['k']
 title = response['title']            # Get title
 a_rtist = response['a']
 print(lg+"\nTitle    : ",title)
